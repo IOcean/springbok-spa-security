@@ -1,0 +1,15 @@
+# NetBeans
+nbproject/
+
+# Bower
+bower_components/
+
+# NodeJS
+node_modules/
+npm-debug.log
+
+# Build
+dist/
+
+#JSPM
+jspm_packages/
