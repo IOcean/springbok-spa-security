@@ -21,7 +21,7 @@ gulp.task('clean', function() {
         .pipe(vinylPaths(del));
 });
 
-gulp.task('javascript', function() {
+gulp.task('process', function() {
     return gulp.src('app/**/*.js')
         .pipe(plumber())
         .pipe(babel())
@@ -29,7 +29,7 @@ gulp.task('javascript', function() {
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('javascript-min', function() {
+gulp.task('process-min', function() {
     return gulp.src('app/**/*.js')
         .pipe(plumber())
         .pipe(babel())
@@ -52,8 +52,8 @@ gulp.task('unit', function(done) {
         }, done).start();
 });
 
-gulp.task('default', ['process']);
+gulp.task('default', ['test', 'build']);
 
-gulp.task('process', ['clean', 'javascript', 'javascript-min']);
+gulp.task('build', ['clean', 'javascript', 'javascript-min']);
 
 gulp.task('test', ['lint', 'unit']);

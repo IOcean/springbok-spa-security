@@ -16,7 +16,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
-      'jspm_packages/github/angular/bower-angular@1.5.0/angular.min.js',
+      'jspm_packages/github/angular/bower-angular@1.5.0/angular.js',
       'app/**/*.js',
       'test/**/*.spec.js'
     ],
