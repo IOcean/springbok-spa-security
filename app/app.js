@@ -1,7 +1,7 @@
 (function() {
     'use-strict';
     
-    var security = angular.module('security', []);
+    const security = angular.module('security', []);
     
     security.service('ModuleService', ModuleService);
     

@@ -4,6 +4,7 @@ const gulp = require('gulp'),
     del = require('del'),
     vinylPaths = require('vinyl-paths'),
     gutil = require('gulp-util'),
+    plumber = require('gulp-plumber'),
     babel = require('gulp-babel'),
     uglify = require('gulp-uglify'),
     concat = require('gulp-concat'),
@@ -22,6 +23,7 @@ gulp.task('clean', function() {
 
 gulp.task('javascript', function() {
     return gulp.src('app/**/*.js')
+        .pipe(plumber())
         .pipe(babel())
         .pipe(concat('springbok-spa-security.js'))
         .pipe(gulp.dest('dist'));
@@ -29,10 +31,10 @@ gulp.task('javascript', function() {
 
 gulp.task('javascript-min', function() {
     return gulp.src('app/**/*.js')
+        .pipe(plumber())
         .pipe(babel())
         .pipe(concat('springbok-spa-security.min.js'))
         .pipe(uglify())
-        .on('error', gutil.log)
         .pipe(gulp.dest('dist'));
 });
 
