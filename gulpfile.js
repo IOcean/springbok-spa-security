@@ -10,10 +10,10 @@ const gulp = require('gulp'),
     eslint = require('gulp-eslint'),
     Server = require('karma').Server;
     
-//function handleError(err) {
-//    gutil.log(err.toString());
-//    this.emit('end');
-//}
+function handleError(err) {
+    gutil.log(err.toString());
+    this.emit('end');
+}
 
 gulp.task('clean', function() {
     return gulp.src('dist')
