@@ -35,8 +35,8 @@
             $config.authCookieName = cookieName;
         };
 
-        this.$get = ['endpoints', '$http', '$rootScope', '$cookieStore', 'credentialService', 'searchCriteriasService', 
-            function (endpoints, $http, $rootScope, $cookieStore, credentialService, searchCriteriasService) {
+        this.$get = ['endpoints', '$http', '$rootScope', '$cookies', 'credentialService', 'searchCriterias', 
+            function (endpoints, $http, $rootScope, $cookies, credentialService, searchCriterias) {
                 /**
                  * Constructor of service
                  */
@@ -64,7 +64,7 @@
                     };
                     
                     var self = this;
-                    var p = $http.post(endpoints.get('authenticate'), postData, config)
+                    var p = $http.post(endpoints.get('login'), postData, config)
                         .success(function (data, status) {
                             if (status === 403) {
                                 $rootScope.$broadcast('NotifyError', {
@@ -106,7 +106,7 @@
                     this.users.auth = true;
                     this.users.password = null;
 
-                    $cookieStore.put($config.authCookieName, {
+                    $cookies.put($config.authCookieName, {
                         auth: true,
                         current: _.omit(user, 'password'),
                         login: user.login
@@ -117,7 +117,7 @@
                  * @returns boolean
                  */
                 AuthService.prototype.authCookieExists = function () {
-                    return !_.isUndefined($cookieStore.get($config.authCookieName));
+                    return !_.isUndefined($cookies.get($config.authCookieName));
                 };
                 /**
                  * Function delete cookie
@@ -126,7 +126,7 @@
                     this.users.login = $config.user.login;
                     this.users.password = $config.user.password;
                     this.users.auth = $config.user.auth;
-                    $cookieStore.remove($config.authCookieName);
+                    $cookies.remove($config.authCookieName);
                 };
                 /**
                  * Function logout
@@ -134,7 +134,7 @@
                 AuthService.prototype.logout = function () {
                     var self = this;
                     credentialService.clean();
-                    searchCriteriasService.resetAllSearchCriterias();
+                    searchCriterias.resetAllSearchCriterias();
                     $http.get(endpoints.get('logout')).success(function () {
                         self.forceLogout();
                         $rootScope.$broadcast('NotifyInfo', 'modules.logout.ok');
@@ -148,14 +148,14 @@
                 AuthService.prototype.forceLogout = function () {
                     this.deleteAuthCookie();
                     credentialService.clean();
-                    searchCriteriasService.resetAllSearchCriterias();
+                    searchCriterias.resetAllSearchCriterias();
                 };
                 /**
                  * Function update users info
                  */
                 AuthService.prototype.updateUsersInfo = function () {
                     if (this.authCookieExists()) {
-                        var users = $cookieStore.get($config.authCookieName);
+                        var users = $cookies.get($config.authCookieName);
                         this.users.login = users.login;
                         this.users.auth = users.auth;
                         $rootScope.$broadcast('$onAlreadyAuthenticated');
@@ -167,7 +167,7 @@
                  */
                 AuthService.prototype.getLogin = function () {
                     if (this.authCookieExists()) {
-                        return $cookieStore.get($config.authCookieName).login;
+                        return $cookies.get($config.authCookieName).login;
                     } else {
                         return '';
                     }
@@ -175,7 +175,7 @@
 
                 AuthService.prototype.getCurrentUser = function () {
                     if (this.authCookieExists()) {
-                        return $cookieStore.get($config.authCookieName).current;
+                        return $cookies.get($config.authCookieName).current;
                     }
                 };
 

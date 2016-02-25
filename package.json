@@ -1,7 +1,9 @@
 {
   "jspm": {
     "dependencies": {
-      "angular": "github:angular/bower-angular@^1.5.0"
+      "angular": "github:angular/bower-angular@^1.5.0",
+      "angular-cookies": "github:angular/bower-angular-cookies@^1.5.0",
+      "springbok/springbok-spa-security": "iocean:springbok/springbok-spa-security@master"
     },
     "devDependencies": {
       "babel": "npm:babel-core@^5.8.24",
@@ -21,6 +23,8 @@
     "gulp-uglify": "^1.5.3",
     "gulp-util": "^3.0.7",
     "jasmine-core": "^2.4.1",
+    "jspm": "^0.16.29",
+    "jspm-git": "^0.4.4",
     "karma": "^0.13.21",
     "karma-babel-preprocessor": "^6.0.1",
     "karma-jasmine": "^0.3.7",

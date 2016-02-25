@@ -10,16 +10,22 @@ System.config({
   },
   paths: {
     "github:*": "jspm_packages/github/*",
-    "npm:*": "jspm_packages/npm/*"
+    "npm:*": "jspm_packages/npm/*",
+    "iocean:*": "jspm_packages/iocean/*"
   },
 
   map: {
     "angular": "github:angular/bower-angular@1.5.0",
+    "angular-cookies": "github:angular/bower-angular-cookies@1.5.0",
     "babel": "npm:babel-core@5.8.35",
     "babel-runtime": "npm:babel-runtime@5.8.35",
     "core-js": "npm:core-js@1.2.6",
     "del": "npm:del@2.2.0",
+    "springbok/springbok-spa-security": "iocean:springbok/springbok-spa-security@master",
     "vinyl-paths": "npm:vinyl-paths@2.1.0",
+    "github:angular/bower-angular-cookies@1.5.0": {
+      "angular": "github:angular/bower-angular@1.5.0"
+    },
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.3.0"
     },
@@ -37,6 +43,9 @@ System.config({
     },
     "github:jspm/nodelibs-util@0.1.0": {
       "util": "npm:util@0.10.3"
+    },
+    "iocean:springbok/springbok-spa-security@master": {
+      "angular": "github:angular/bower-angular@1.5.0"
     },
     "npm:array-union@1.0.1": {
       "array-uniq": "npm:array-uniq@1.0.2"
