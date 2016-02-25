@@ -54,6 +54,6 @@ gulp.task('unit', function(done) {
 
 gulp.task('default', ['test', 'build']);
 
-gulp.task('build', ['clean', 'javascript', 'javascript-min']);
+gulp.task('build', ['clean', 'process', 'process-min']);
 
 gulp.task('test', ['lint', 'unit']);

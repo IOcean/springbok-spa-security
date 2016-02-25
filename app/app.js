@@ -1,7 +1,7 @@
 (function() {
     'use-strict';
     
-    let securityDependencies = [
+    const securityDependencies = [
         'ngCookie',
         'springbok.core'
     ];
