@@ -185,7 +185,7 @@
                 var self = this;
                 credentialService.clean();
                 searchCriterias.resetAllSearchCriterias();
-                $http.get(endpoints.get('logout')).success(function () {
+                $http.post(endpoints.get('logout')).success(function () {
                     self.forceLogout();
                     $rootScope.$broadcast('NotifyInfo', 'modules.logout.ok');
                     $rootScope.$broadcast('AuthChange', false);
