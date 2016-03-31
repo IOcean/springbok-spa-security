@@ -41,7 +41,7 @@
                  * Constructor of service
                  */
                 function AuthService() {
-                    this.users = _.clone($config.user);
+                    this.user = _.clone($config.user);
                     this.updateUsersInfo();
                 }
 
@@ -102,9 +102,9 @@
                  * @param login
                  */
                 AuthService.prototype.setAuthCookie = function (user) {
-                    this.users.login = user.login;
-                    this.users.auth = true;
-                    this.users.password = null;
+                    this.user.login = user.login;
+                    this.user.auth = true;
+                    this.user.password = null;
 
                     $cookies.put($config.authCookieName, {
                         auth: true,
@@ -123,9 +123,9 @@
                  * Function delete cookie
                  */
                 AuthService.prototype.deleteAuthCookie = function () {
-                    this.users.login = $config.user.login;
-                    this.users.password = $config.user.password;
-                    this.users.auth = $config.user.auth;
+                    this.user.login = $config.user.login;
+                    this.user.password = $config.user.password;
+                    this.user.auth = $config.user.auth;
                     $cookies.remove($config.authCookieName);
                 };
                 /**
@@ -156,8 +156,8 @@
                 AuthService.prototype.updateUsersInfo = function () {
                     if (this.authCookieExists()) {
                         var users = $cookies.get($config.authCookieName);
-                        this.users.login = users.login;
-                        this.users.auth = users.auth;
+                        this.user.login = users.login;
+                        this.user.auth = users.auth;
                         $rootScope.$broadcast('$onAlreadyAuthenticated');
                         $rootScope.$broadcast('AuthChange', users.auth);
                     }
