@@ -108,14 +108,8 @@
                 postData.append('submit', 'login');
                 postData.append('_spring_security_remember_me', true);
 
-                var config = {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                };
-
                 var self = this;
-                var p = $http.post(endpoints.get('login'), postData, config).success(function (data, status) {
+                var p = $http.post(endpoints.get('login'), postData).success(function (data, status) {
                     if (status === 403) {
                         $rootScope.$broadcast('NotifyError', 'SECURITY_LOGIN_INVALID');
                         self.forceLogout();
