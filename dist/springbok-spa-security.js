@@ -8,8 +8,8 @@
     security.run(['endpoints', function (endpoints) {
         endpoints.add('login', 'authentication');
         endpoints.add('logout', 'logout');
-        endpoints.add('authenticatedUser', 'users/authenticated');
-        endpoints.add('credentialsSearch', 'credential/search');
+        endpoints.add('authenticatedUser', 'accounts/authenticated');
+        endpoints.add('credentialsSearch', 'credentials/search');
     }]);
 })();
 (function () {
@@ -103,7 +103,7 @@
              */
             AuthService.prototype.login = function (login, password) {
                 var postData = new FormData();
-                postData.append('login', login);
+                postData.append('username', login);
                 postData.append('password', password);
                 postData.append('submit', 'login');
                 postData.append('_spring_security_remember_me', true);
@@ -117,16 +117,14 @@
                 var self = this;
                 var p = $http.post(endpoints.get('login'), postData, config).success(function (data, status) {
                     if (status === 403) {
-                        $rootScope.$broadcast('NotifyError', {
-                            message: 'modules.login.invalid'
-                        });
+                        $rootScope.$broadcast('NotifyError', 'SECURITY_LOGIN_INVALID');
                         self.forceLogout();
                     } else if (status === 200) {
                         self.getUserInfos().then(function (user) {
                             self.setAuthCookie(user);
                             $rootScope.$broadcast('$onAuthenticationSuccess');
 
-                            $rootScope.$broadcast('NotifyInfo', 'modules.login.ok');
+                            $rootScope.$broadcast('NotifyInfo', 'SECURITY_LOGIN_SUCCESS');
                             $rootScope.$broadcast('AuthChange', true);
                         });
                     }
@@ -187,7 +185,7 @@
                 searchCriterias.resetAllSearchCriterias();
                 $http.post(endpoints.get('logout')).success(function () {
                     self.forceLogout();
-                    $rootScope.$broadcast('NotifyInfo', 'modules.logout.ok');
+                    $rootScope.$broadcast('NotifyInfo', 'SECURITY_LOGIN_LOGOUT');
                     $rootScope.$broadcast('AuthChange', false);
                     $rootScope.$broadcast('$onLogoutSuccess');
                 });

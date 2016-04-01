@@ -11,7 +11,7 @@
     security.run(['endpoints', function (endpoints) {
         endpoints.add('login', 'authentication');
         endpoints.add('logout', 'logout');
-        endpoints.add('authenticatedUser', 'users/authenticated');
-        endpoints.add('credentialsSearch', 'credential/search');
+        endpoints.add('authenticatedUser', 'accounts/authenticated');
+        endpoints.add('credentialsSearch', 'credentials/search');
     }]);
 })();
