@@ -57,8 +57,14 @@
                     postData.append('submit', 'login');
                     postData.append('_spring_security_remember_me', true);
                     
+                    var config = {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    };
+                    
                     var self = this;
-                    var p = $http.post(endpoints.get('login'), postData)
+                    var p = $http.post(endpoints.get('login'), postData, config)
                         .success(function (data, status) {
                             if (status === 403) {
                                 $rootScope.$broadcast('NotifyError', 'SECURITY_LOGIN_INVALID');
@@ -67,12 +73,12 @@
                                 self.getUserInfos().then(function (user) {
                                     self.setAuthCookie(user);
                                     $rootScope.$broadcast('$onAuthenticationSuccess');
-
                                     $rootScope.$broadcast('NotifyInfo', 'SECURITY_LOGIN_SUCCESS');
                                     $rootScope.$broadcast('AuthChange', true);
                                 });
                             }
                         });
+                        
                     p.then(function (data) {
                         if (data.status === 200) {
                             var promise = credentialService.getCredentialsForUserLogin(login);
