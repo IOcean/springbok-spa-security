@@ -136,8 +136,8 @@
             };
 
             AuthService.prototype.getUserInfos = function () {
-                return $http.get(endpoints.get('authenticatedUser')).then(function (result) {
-                    return result.data;
+                return $http.get(endpoints.get('authenticatedUser')).then(function (account) {
+                    return account;
                 });
             };
 
