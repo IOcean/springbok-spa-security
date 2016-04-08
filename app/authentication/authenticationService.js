@@ -65,7 +65,8 @@
                     };
                     
                     var self = this;
-                    var p = $http.post(endpoints.get('login'), jQuery.param(postData), config)
+                    $http
+                        .post(endpoints.get('login'), jQuery.param(postData), config)
                         .then(function (data, status) {
                             if (status === 403) {
                                 $rootScope.$broadcast('NotifyError', 'SECURITY_LOGIN_INVALID');
@@ -73,21 +74,16 @@
                             } else if (status === 200) {
                                 self.getUserInfos().then(function (user) {
                                     self.setAuthCookie(user);
+                                    credentialService.getCredentialsForUserLogin(login).then(function(data) {
+                                        credentialService.setCredentials(data);
+                                    });
+
                                     $rootScope.$broadcast('$onAuthenticationSuccess');
                                     $rootScope.$broadcast('NotifyInfo', 'SECURITY_LOGIN_SUCCESS');
                                     $rootScope.$broadcast('AuthChange', true);
                                 });
                             }
                         });
-                        
-                    p.then(function (data) {
-                        if (data.status === 200) {
-                            var promise = credentialService.getCredentialsForUserLogin(login);
-                            promise.then(function (data) {
-                                credentialService.setCredentials(data);
-                            });
-                        }
-                    });
                 };
 
                 AuthService.prototype.getUserInfos = function () {
