@@ -23,7 +23,7 @@
                         size: 1000,
                         direction: 'asc',
                         properties: 'label',
-                        login: userLogin
+                        username: userLogin
                     }
                 };
 

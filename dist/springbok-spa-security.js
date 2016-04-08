@@ -116,7 +116,7 @@
                 };
 
                 var self = this;
-                var p = $http.post(endpoints.get('login'), jQuery.param(postData), config).success(function (data, status) {
+                var p = $http.post(endpoints.get('login'), jQuery.param(postData), config).then(function (data, status) {
                     if (status === 403) {
                         $rootScope.$broadcast('NotifyError', 'SECURITY_LOGIN_INVALID');
                         self.forceLogout();
@@ -257,7 +257,7 @@
                         size: 1000,
                         direction: 'asc',
                         properties: 'label',
-                        login: userLogin
+                        username: userLogin
                     }
                 };
 
