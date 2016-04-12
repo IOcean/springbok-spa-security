@@ -9,9 +9,8 @@
     const security = angular.module('springbok.security', securityDependencies);
     
     security.run(['endpoints', function (endpoints) {
-        endpoints.add('login', 'authentication');
-        endpoints.add('logout', 'logout');
-        endpoints.add('authenticatedUser', 'accounts/authenticated');
-        endpoints.add('credentialsSearch', 'credentials/search');
+        endpoints.add('accounts', 'accounts');
+        endpoints.add('currentAccount', 'accounts/authenticated');
+        endpoints.add('credentials', 'credentials');
     }]);
 })();

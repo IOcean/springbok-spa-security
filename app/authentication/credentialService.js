@@ -2,7 +2,7 @@
 
     'use strict';
 
-    angular.module('springbok.security').service( 'credentialService', credentialService);
+    angular.module('springbok.security.authentication').service( 'credentialService', credentialService);
     
     credentialService.$inject = ['endpoints', '$http', '$q'];
     
@@ -11,7 +11,7 @@
         var promise;
 
         return {
-            getCredentialsForUserLogin: function (userLogin) {
+            getCredentialsForUsername: function (username) {
                 if (!_.isUndefined(credentials) && credentials.length > 0 && !_.isUndefined(promise)) {
                     return promise;
                 }
@@ -23,7 +23,7 @@
                         size: 1000,
                         direction: 'asc',
                         properties: 'label',
-                        username: userLogin
+                        username: username
                     }
                 };
 
@@ -32,8 +32,7 @@
                     deferred.resolve(credentials);
                 });
 
-                promise = deferred.promise;
-                return promise;
+                return deferred.promise;
             },
             hasCredential: function (credentialCode) {
                 var filtredResults = _.filter(credentials, function (c) {

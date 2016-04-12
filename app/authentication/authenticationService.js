@@ -1,180 +1,71 @@
 (function () {
     'use strict';
 
-    /**
-     * Provider service authentication
-     */
-    angular.module('springbok.security').provider('authenticationService', function() {
-        /**
-         * Configuration default of service
-         */
-        var $config = {
-            user: {
-                login: '',
-                password: '',
-                auth: false
-            },
-            authCookieName: 'authentification'
+    angular.module('springbok.security.authentication').service('authenticationService', authenticationService);
+    
+    authenticationService.$inject = ['$log', '$q', '$http', 'endpoints', 'credentialService', 'searchCriterias'];
+    
+    function authenticationService($log, $q, $http, endpoints, credentialService, searchCriterias) {
+        var authentication = this;
+        
+        initAccount();
+        
+        authentication.logout = function() {
+            initAccount();
+            $http.defaults.headers.common['Authorization'] = '';
+            localStorage.removeItem('auth');
+            credentialService.clean();
+            searchCriterias.resetAllSearchCriterias();
         };
-        /**
-         * Function initialise configuration login default
-         */
-        this.setDefaultLogin = function (login) {
-            $config.user.login = login;
-        };
-        /**
-         * Function initialise configuration password default
-         */
-        this.setDefaultPwd = function (pwd) {
-            $config.user.password = pwd;
-        };
-        /**
-         * Function initialise configuration authCookieName
-         */
-        this.setCookieName = function (cookieName) {
-            $config.authCookieName = cookieName;
-        };
-
-        this.$get = ['endpoints', '$http', '$rootScope', '$cookies', 'credentialService', 'searchCriterias', 
-            function (endpoints, $http, $rootScope, $cookies, credentialService, searchCriterias) {
-                /**
-                 * Constructor of service
-                 */
-                function AuthService() {
-                    this.user = _.clone($config.user);
-                    this.updateUsersInfo();
+        
+        authentication.login = function() {
+            var deferred = $q.defer();
+            
+            $http.get(endpoints.get('currentAccount')).then(function(currentAccount) {
+                if (currentAccount.status === 200) {
+                    $http.defaults.headers.common['Authorization'] = getAuthorizationHeader();
+                    authentication.account.infos = currentAccount.data;
+                    authentication.account.authenticated = true;
+                    
+                    credentialService.getCredentialsForUsername(authentication.account.username);
+                    
+                    deferred.resolve(currentAccount.infos);
+                } else if (currentAccount.status === 403 || currentAccount.status === 401) {
+                    $log.debug("Wrong username/password");
+                    deferred.reject();
+                } else {
+                    $log.error('An error occured during login');
+                    authentication.logout();
+                    deferred.reject();
                 }
-
-                /**
-                 * Function login
-                 * @param login
-                 * @param password
-                 */
-                AuthService.prototype.login = function (login, password) {
-                    var postData = {
-                        username: login,
-                        password: password,
-                        submit: 'login',
-                        _spring_security_remember_me: true
-                    };
-                    
-                    var config = {
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        }
-                    };
-                    
-                    var self = this;
-                    $http
-                        .post(endpoints.get('login'), jQuery.param(postData), config)
-                        .then(function (data, status) {
-                            if (status === 403) {
-                                $rootScope.$broadcast('NotifyError', 'SECURITY_LOGIN_INVALID');
-                                self.forceLogout();
-                            } else if (status === 200) {
-                                self.getUserInfos().then(function (user) {
-                                    self.setAuthCookie(user);
-                                    credentialService.getCredentialsForUserLogin(login).then(function(data) {
-                                        credentialService.setCredentials(data);
-                                    });
-
-                                    $rootScope.$broadcast('$onAuthenticationSuccess');
-                                    $rootScope.$broadcast('NotifyInfo', 'SECURITY_LOGIN_SUCCESS');
-                                    $rootScope.$broadcast('AuthChange', true);
-                                });
-                            }
-                        });
-                };
-
-                AuthService.prototype.getUserInfos = function () {
-                    return $http.get(endpoints.get('authenticatedUser')).then(function(account) {
-                        return account;
-                    });
-                };
-
-                /**
-                 * Function set cookie
-                 * @param login
-                 */
-                AuthService.prototype.setAuthCookie = function (user) {
-                    this.user.login = user.login;
-                    this.user.auth = true;
-                    this.user.password = null;
-
-                    $cookies.put($config.authCookieName, {
-                        auth: true,
-                        current: _.omit(user, 'password'),
-                        login: user.login
-                    });
-                };
-                /**
-                 * Function test cookie Exist
-                 * @returns boolean
-                 */
-                AuthService.prototype.authCookieExists = function () {
-                    return !_.isUndefined($cookies.get($config.authCookieName));
-                };
-                /**
-                 * Function delete cookie
-                 */
-                AuthService.prototype.deleteAuthCookie = function () {
-                    this.user.login = $config.user.login;
-                    this.user.password = $config.user.password;
-                    this.user.auth = $config.user.auth;
-                    $cookies.remove($config.authCookieName);
-                };
-                /**
-                 * Function logout
-                 */
-                AuthService.prototype.logout = function () {
-                    var self = this;
-                    credentialService.clean();
-                    searchCriterias.resetAllSearchCriterias();
-                    $http.post(endpoints.get('logout')).success(function () {
-                        self.forceLogout();
-                        $rootScope.$broadcast('NotifyInfo', 'SECURITY_LOGIN_LOGOUT');
-                        $rootScope.$broadcast('AuthChange', false);
-                        $rootScope.$broadcast('$onLogoutSuccess');
-                    });
-                };
-                /**
-                 * Function force logout users
-                 */
-                AuthService.prototype.forceLogout = function () {
-                    this.deleteAuthCookie();
-                    credentialService.clean();
-                    searchCriterias.resetAllSearchCriterias();
-                };
-                /**
-                 * Function update users info
-                 */
-                AuthService.prototype.updateUsersInfo = function () {
-                    if (this.authCookieExists()) {
-                        var users = $cookies.get($config.authCookieName);
-                        this.user.login = users.login;
-                        this.user.auth = users.auth;
-                        $rootScope.$broadcast('$onAlreadyAuthenticated');
-                        $rootScope.$broadcast('AuthChange', users.auth);
-                    }
-                };
-                /**
-                 * Function get users login
-                 */
-                AuthService.prototype.getLogin = function () {
-                    if (this.authCookieExists()) {
-                        return $cookies.get($config.authCookieName).login;
-                    } else {
-                        return '';
-                    }
-                };
-
-                AuthService.prototype.getCurrentUser = function () {
-                    if (this.authCookieExists()) {
-                        return $cookies.get($config.authCookieName).current;
-                    }
-                };
-
-                return new AuthService();
-            }];
-    });
+            }, function() {
+                $log.error('An error occured during login');
+                authentication.logout();
+                deferred.reject();
+            });
+            
+            return deferred.promise;
+        };
+        
+        authentication.getCurrentAccount = function () {
+            return authentication.account.infos;
+        };
+        
+        function initAccount() {
+            authentication.account = {
+                infos : {},
+                username: '',
+                password: '',
+                authenticated: false
+            };
+        };
+     
+        function getAuthorizationHeader () {
+            var authorizationheader = 'Basic ';
+            
+            authorizationheader += 'YWRtaW46YWRtaW4=';
+            
+            return authorizationheader;
+        };
+    }
 })();
