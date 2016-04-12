@@ -3,48 +3,45 @@
 
     angular.module('springbok.security').service('authenticationService', authenticationService);
     
-    authenticationService.$inject = ['$log', '$q', '$http', 'endpoints', 'credentialService', 'searchCriterias'];
+    authenticationService.$inject = ['$q', '$http', 'encryptionUtils', 'endpoints', 'credentialService', 'searchCriterias'];
     
-    function authenticationService($log, $q, $http, endpoints, credentialService, searchCriterias) {
+    function authenticationService($q, $http, encryptionUtils, endpoints, credentialService, searchCriterias) {
         var authentication = this;
         
         initAccount();
         
         authentication.logout = function() {
             initAccount();
-            $http.defaults.headers.common['Authorization'] = '';
-            localStorage.removeItem('auth');
+            delete $http.defaults.headers.common['Authorization'];
             credentialService.clean();
             searchCriterias.resetAllSearchCriterias();
         };
         
         authentication.login = function() {
-            var deferred = $q.defer();
+            var defer = $q.defer();
+            
+            $http.defaults.headers.common['Authorization'] = getAuthorizationHeader();
             
             $http.get(endpoints.get('currentAccount')).then(function(currentAccount) {
                 if (currentAccount.status === 200) {
-                    $http.defaults.headers.common['Authorization'] = getAuthorizationHeader();
                     authentication.account.infos = currentAccount.data;
                     authentication.account.authenticated = true;
                     
                     credentialService.getCredentialsForUsername(authentication.account.username);
                     
-                    deferred.resolve(currentAccount.infos);
+                    defer.resolve(currentAccount.infos);
                 } else if (currentAccount.status === 403 || currentAccount.status === 401) {
-                    $log.debug("Wrong username/password");
-                    deferred.reject();
+                    defer.reject('Wrong username/password');
                 } else {
-                    $log.error('An error occured during login');
                     authentication.logout();
-                    deferred.reject();
+                    defer.reject('An error occured during login');
                 }
             }, function() {
-                $log.error('An error occured during login');
                 authentication.logout();
-                deferred.reject();
+                defer.reject('An error occured during login');
             });
             
-            return deferred.promise;
+            return defer.promise;
         };
         
         authentication.getCurrentAccount = function () {
@@ -58,14 +55,14 @@
                 password: '',
                 authenticated: false
             };
-        };
+        }
      
-        function getAuthorizationHeader () {
+        function getAuthorizationHeader() {
             var authorizationheader = 'Basic ';
             
-            authorizationheader += 'YWRtaW46YWRtaW4=';
+            authorizationheader += encryptionUtils.encodeToBase64(authentication.account.username + ':' + authentication.account.password);
             
             return authorizationheader;
-        };
+        }
     }
 })();

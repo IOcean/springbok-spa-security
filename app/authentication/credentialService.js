@@ -27,7 +27,7 @@
                     }
                 };
 
-                $http.get(endpoints.get('credentialsSearch'), credentialsParams).success(function (data) {
+                $http.get(endpoints.get('credentials') + '/search', credentialsParams).success(function (data) {
                     credentials = data.content;
                     deferred.resolve(credentials);
                 });
