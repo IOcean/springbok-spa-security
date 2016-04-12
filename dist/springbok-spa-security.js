@@ -14,7 +14,7 @@
 (function () {
     'use strict';
 
-    angular.module('springbok.security.authentication').controller('authenticationController', authenticationController);
+    angular.module('springbok.security').controller('authenticationController', authenticationController);
 
     authenticationController.$inject = ['authenticationRedirect', 'authenticationService', '$location'];
 
@@ -42,14 +42,14 @@
 (function () {
     'use strict';
 
-    angular.module('springbok.security.authentication').value('authenticationRedirect', {
+    angular.module('springbok.security').value('authenticationRedirect', {
         url: null
     });
 })();
 (function () {
     'use strict';
 
-    angular.module('springbok.security.authentication').service('authenticationService', authenticationService);
+    angular.module('springbok.security').service('authenticationService', authenticationService);
 
     authenticationService.$inject = ['$log', '$q', '$http', 'endpoints', 'credentialService', 'searchCriterias'];
 
@@ -121,7 +121,7 @@
 
     'use strict';
 
-    angular.module('springbok.security.authentication').service('credentialService', credentialService);
+    angular.module('springbok.security').service('credentialService', credentialService);
 
     credentialService.$inject = ['endpoints', '$http', '$q'];
 

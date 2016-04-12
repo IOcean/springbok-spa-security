@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('springbok.security.authentication').controller('authenticationController', authenticationController);
+    angular.module('springbok.security').controller('authenticationController', authenticationController);
     
     authenticationController.$inject = ['authenticationRedirect', 'authenticationService', '$location'];
     

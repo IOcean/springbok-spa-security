@@ -2,7 +2,7 @@
 
     'use strict';
 
-    angular.module('springbok.security.authentication').service( 'credentialService', credentialService);
+    angular.module('springbok.security').service( 'credentialService', credentialService);
     
     credentialService.$inject = ['endpoints', '$http', '$q'];
     

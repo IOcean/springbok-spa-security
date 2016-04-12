@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('springbok.security.authentication').service('authenticationService', authenticationService);
+    angular.module('springbok.security').service('authenticationService', authenticationService);
     
     authenticationService.$inject = ['$log', '$q', '$http', 'endpoints', 'credentialService', 'searchCriterias'];
     
