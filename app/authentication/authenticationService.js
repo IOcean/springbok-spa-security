@@ -30,15 +30,15 @@
                     credentialService.getCredentialsForUsername(authentication.account.username);
                     
                     defer.resolve(currentAccount.infos);
-                } else if (currentAccount.status === 403 || currentAccount.status === 401) {
-                    defer.reject('Wrong username/password');
-                } else {
-                    authentication.logout();
-                    defer.reject('An error occured during login');
-                }
-            }, function() {
+                } 
+            }, function(error) {
                 authentication.logout();
-                defer.reject('An error occured during login');
+                
+                if (error.status === 403 || error.status === 401) {
+                    defer.reject({reason: 'wrongCredentials'});
+                } else {
+                    defer.reject({reason: 'serverError'});
+                }
             });
             
             return defer.promise;

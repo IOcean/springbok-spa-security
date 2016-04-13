@@ -16,24 +16,36 @@
 
     angular.module('springbok.security').controller('authenticationController', authenticationController);
 
-    authenticationController.$inject = ['authenticationRedirect', 'authenticationService', '$location'];
+    authenticationController.$inject = ['$scope', 'authenticationRedirect', 'authenticationService', '$location'];
 
-    function authenticationController(authenticationRedirect, authenticationService, $location) {
+    function authenticationController($scope, authenticationRedirect, authenticationService, $location) {
         var authentication = this;
 
         authentication.account = authenticationService.account;
 
         this.login = function () {
             authenticationService.login(this.account.username, this.account.password).then(function () {
+                $scope.$emit('Notify', 'success', 'SECURITY_LOGIN_SUCCESS');
+
                 if (!_.isNull(authenticationRedirect.url)) {
                     $location.path(authenticationRedirect.url);
                     authenticationRedirect.url = null;
+                }
+            }, function (error) {
+                console.log(error);
+
+                if (error.reason === 'wrongCredentials') {
+                    $scope.$emit('Notify', 'error', 'SECURITY_LOGIN_INVALID');
+                } else {
+                    $scope.$emit('Notify', 'error', 'ERROR_SERVER');
                 }
             });
         };
 
         this.logout = function () {
             authenticationService.logout();
+            $scope.$emit('Notify', 'warning', 'SECURITY_LOGIN_LOGOUT');
+
             //avoid user to reconnect with less credentials on the same current page
             authenticationRedirect.url = '/';
         };
@@ -78,15 +90,15 @@
                     credentialService.getCredentialsForUsername(authentication.account.username);
 
                     defer.resolve(currentAccount.infos);
-                } else if (currentAccount.status === 403 || currentAccount.status === 401) {
-                    defer.reject('Wrong username/password');
-                } else {
-                    authentication.logout();
-                    defer.reject('An error occured during login');
                 }
-            }, function () {
+            }, function (error) {
                 authentication.logout();
-                defer.reject('An error occured during login');
+
+                if (error.status === 403 || error.status === 401) {
+                    defer.reject({ reason: 'wrongCredentials' });
+                } else {
+                    defer.reject({ reason: 'serverError' });
+                }
             });
 
             return defer.promise;
