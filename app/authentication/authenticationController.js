@@ -11,7 +11,7 @@
         authentication.account = authenticationService.account;
         
         this.login = function () {
-            authenticationService.login(this.account.username, this.account.password).then(function() {
+            authenticationService.login().then(function() {
                 $scope.$emit('Notify', 'success', 'SECURITY_LOGIN_SUCCESS');
                 
                 if (!_.isNull(authenticationRedirect.url)) {
@@ -19,8 +19,6 @@
                     authenticationRedirect.url = null;
                 }
             }, function(error) {
-                console.log(error);
-                
                 if (error.reason === 'wrongCredentials') {
                     $scope.$emit('Notify', 'error', 'SECURITY_LOGIN_INVALID'); 
                 } else {
