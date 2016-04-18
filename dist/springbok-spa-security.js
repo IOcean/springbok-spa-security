@@ -88,6 +88,8 @@
                     credentialService.getCredentialsForUsername(authentication.account.username);
 
                     defer.resolve(currentAccount.infos);
+                } else {
+                    defer.reject({ reason: 'serverError' });
                 }
             }, function (error) {
                 authentication.logout();
