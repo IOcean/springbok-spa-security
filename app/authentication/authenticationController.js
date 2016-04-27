@@ -30,9 +30,7 @@
         this.logout = function () {
             authenticationService.logout();
             $scope.$emit('Notify', 'warning', 'SECURITY_LOGIN_LOGOUT');
-            
-            //avoid user to reconnect with less credentials on the same current page
-            authenticationRedirect.url = '/';
+            $location.path('/');
         };
     }
 })();

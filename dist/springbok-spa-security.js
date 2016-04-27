@@ -43,9 +43,7 @@
         this.logout = function () {
             authenticationService.logout();
             $scope.$emit('Notify', 'warning', 'SECURITY_LOGIN_LOGOUT');
-
-            //avoid user to reconnect with less credentials on the same current page
-            authenticationRedirect.url = '/';
+            $location.path('/');
         };
     }
 })();
@@ -72,7 +70,7 @@
             initAccount();
             delete $http.defaults.headers.common['Authorization'];
             credentialService.clean();
-            searchCriterias.resetAllSearchCriterias();
+            searchCriterias.clear();
         };
 
         authentication.login = function () {
@@ -88,8 +86,6 @@
                     credentialService.getCredentialsForUsername(authentication.account.username);
 
                     defer.resolve(currentAccount.infos);
-                } else {
-                    defer.reject({ reason: 'serverError' });
                 }
             }, function (error) {
                 authentication.logout();
@@ -100,6 +96,8 @@
                     defer.reject({ reason: 'serverError' });
                 }
             });
+
+            authentication.account.authenticated = true;
 
             return defer.promise;
         };
