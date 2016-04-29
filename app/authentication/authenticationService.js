@@ -17,16 +17,18 @@
             delete $http.defaults.headers.common['Authorization'];
             credentialService.clean();
             searchCriterias.clear();
+            sessionStorage.clear();
         };
         
         authentication.login = function() {
             var defer = $q.defer();
             
-            $http.defaults.headers.common['Authorization'] = getAuthorizationHeader();
+            sessionStorage.token = getAuthorizationHeader();
             
             $http.get(endpoints.get('currentAccount')).then(function(currentAccount) {
                 if (currentAccount.status === 200) {
                     authentication.account.infos = currentAccount.data;
+                    
                     authentication.account.authenticated = true;
                     
                     credentialService.getCredentialsForUsername(authentication.account.username);

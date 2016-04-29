@@ -25,7 +25,6 @@
 
         this.login = function () {
             authenticationService.login().then(function () {
-                console.log('success');
                 $scope.$emit('Notify', 'success', 'SECURITY_LOGIN_SUCCESS');
                 $scope.$emit('AuthenticationChange');
 
@@ -34,9 +33,6 @@
                     authenticationRedirect.url = null;
                 }
             }, function (error) {
-                console.log('error');
-                console.log(error);
-
                 if (error.reason === 'wrongCredentials') {
                     $scope.$emit('Notify', 'error', 'SECURITY_LOGIN_INVALID');
                 } else {
@@ -82,18 +78,19 @@
             delete $http.defaults.headers.common['Authorization'];
             credentialService.clean();
             searchCriterias.clear();
+            sessionStorage.clear();
         };
 
         authentication.login = function () {
             var defer = $q.defer();
 
-            $http.defaults.headers.common['Authorization'] = getAuthorizationHeader();
+            sessionStorage.token = getAuthorizationHeader();
+            console.log('loginToken', sessionStorage.token);
 
             $http.get(endpoints.get('currentAccount')).then(function (currentAccount) {
-                console.log('authenticationService.success');
-                console.log(currentAccount);
                 if (currentAccount.status === 200) {
                     authentication.account.infos = currentAccount.data;
+
                     authentication.account.authenticated = true;
 
                     credentialService.getCredentialsForUsername(authentication.account.username);
@@ -101,8 +98,6 @@
                     defer.resolve(currentAccount.infos);
                 }
             }, function (error) {
-                console.log('authenticationService.error');
-                console.log(error);
                 authentication.logout();
 
                 if (error.status === 403 || error.status === 401) {
