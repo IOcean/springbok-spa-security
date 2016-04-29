@@ -8,6 +8,8 @@
     function authenticationService($q, $http, encryptionUtils, endpoints, credentialService, searchCriterias) {
         var authentication = this;
         
+        authentication.account = {};
+        
         initAccount();
         
         authentication.logout = function() {
@@ -40,8 +42,6 @@
                     defer.reject({reason: 'serverError'});
                 }
             });
-            
-            authentication.account.authenticated = true;
             
             return defer.promise;
         };

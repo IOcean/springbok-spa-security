@@ -13,6 +13,7 @@
         this.login = function () {
             authenticationService.login().then(function() {
                 $scope.$emit('Notify', 'success', 'SECURITY_LOGIN_SUCCESS');
+                $scope.$emit('AuthenticationChange');
                 
                 if (!_.isNull(authenticationRedirect.url)) {
                     $location.path(authenticationRedirect.url);
@@ -24,12 +25,16 @@
                 } else {
                     $scope.$emit('Notify', 'error', 'ERROR_SERVER');
                 }
+                
+                $scope.$emit('AuthenticationChange');
             });
         };
         
         this.logout = function () {
             authenticationService.logout();
+            authentication.account = authenticationService.account;
             $scope.$emit('Notify', 'warning', 'SECURITY_LOGIN_LOGOUT');
+            $scope.$emit('AuthenticationChange');
             $location.path('/');
         };
     }
