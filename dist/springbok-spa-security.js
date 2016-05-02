@@ -16,12 +16,12 @@
 
     angular.module('springbok.security').controller('authenticationController', authenticationController);
 
-    authenticationController.$inject = ['$scope', 'authenticationRedirect', 'authenticationService', '$location'];
+    authenticationController.$inject = ['$scope', '$location', 'session', 'authenticationRedirect', 'authenticationService'];
 
-    function authenticationController($scope, authenticationRedirect, authenticationService, $location) {
+    function authenticationController($scope, $location, session, authenticationRedirect, authenticationService) {
         var authentication = this;
 
-        authentication.account = authenticationService.account;
+        authentication.session = session;
 
         this.login = function () {
             authenticationService.login().then(function () {
@@ -50,6 +50,8 @@
             $scope.$emit('AuthenticationChange');
             $location.path('/');
         };
+
+        console.log('authCtrl : session.account', session.account);
     }
 })();
 (function () {
@@ -64,36 +66,27 @@
 
     angular.module('springbok.security').service('authenticationService', authenticationService);
 
-    authenticationService.$inject = ['$q', '$http', 'encryptionUtils', 'endpoints', 'credentialService', 'searchCriterias'];
+    authenticationService.$inject = ['$q', '$http', 'session', 'endpoints', 'credentialService', 'searchCriterias'];
 
-    function authenticationService($q, $http, encryptionUtils, endpoints, credentialService, searchCriterias) {
+    function authenticationService($q, $http, session, endpoints, credentialService, searchCriterias) {
         var authentication = this;
 
-        authentication.account = {};
-
-        initAccount();
-
         authentication.logout = function () {
-            initAccount();
             delete $http.defaults.headers.common['Authorization'];
             credentialService.clean();
             searchCriterias.clear();
-            sessionStorage.clear();
+            session.clear();
         };
 
         authentication.login = function () {
             var defer = $q.defer();
 
-            sessionStorage.token = getAuthorizationHeader();
-            console.log('loginToken', sessionStorage.token);
+            session.setAuthorizationHeader();
 
             $http.get(endpoints.get('currentAccount')).then(function (currentAccount) {
                 if (currentAccount.status === 200) {
-                    authentication.account.infos = currentAccount.data;
-
-                    authentication.account.authenticated = true;
-
-                    credentialService.getCredentialsForUsername(authentication.account.username);
+                    session.update(currentAccount.data);
+                    credentialService.getCredentialsForUsername(session.account.username);
 
                     defer.resolve(currentAccount.infos);
                 }
@@ -109,27 +102,6 @@
 
             return defer.promise;
         };
-
-        authentication.getCurrentAccount = function () {
-            return authentication.account.infos;
-        };
-
-        function initAccount() {
-            authentication.account = {
-                infos: {},
-                username: '',
-                password: '',
-                authenticated: false
-            };
-        }
-
-        function getAuthorizationHeader() {
-            var authorizationheader = 'Basic ';
-
-            authorizationheader += encryptionUtils.encodeToBase64(authentication.account.username + ':' + authentication.account.password);
-
-            return authorizationheader;
-        }
     }
 })();
 (function () {
@@ -181,6 +153,66 @@
                 credentials = [];
                 promise = null;
             }
+        };
+    }
+})();
+(function () {
+    'use strict';
+
+    angular.module('springbok.security').service('session', session);
+
+    session.$inject = ['encryptionUtils'];
+
+    function session(encryptionUtils) {
+        var session = this;
+
+        session.account = {};
+
+        getCurrent();
+
+        session.persist = function () {
+            localStorage.account = JSON.stringify(session.account);
+        };
+
+        session.update = function (account) {
+            session.account.infos = account;
+            session.account.authenticated = true;
+            session.persist();
+        };
+
+        session.clear = function () {
+            init();
+            localStorage.clear();
+        };
+
+        session.getCurrent = getCurrent;
+
+        session.setAuthorizationHeader = function () {
+            var authorizationheader = 'Basic ';
+            authorizationheader += encryptionUtils.encodeToBase64(session.account.username + ':' + session.account.password);
+
+            session.account.token = authorizationheader;
+            session.persist();
+        };
+
+        function getCurrent() {
+            if (localStorage.account) {
+                var account = JSON.parse(localStorage.account);
+                session.account = account;
+            } else {
+                init();
+            }
+
+            return session.account;
+        }
+
+        function init() {
+            session.account = {
+                infos: {},
+                username: '',
+                password: '',
+                authenticated: false
+            };
         };
     }
 })();

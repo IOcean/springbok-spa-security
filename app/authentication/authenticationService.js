@@ -3,35 +3,27 @@
 
     angular.module('springbok.security').service('authenticationService', authenticationService);
     
-    authenticationService.$inject = ['$q', '$http', 'encryptionUtils', 'endpoints', 'credentialService', 'searchCriterias'];
+    authenticationService.$inject = ['$q', '$http', 'session', 'endpoints', 'credentialService', 'searchCriterias'];
     
-    function authenticationService($q, $http, encryptionUtils, endpoints, credentialService, searchCriterias) {
+    function authenticationService($q, $http, session, endpoints, credentialService, searchCriterias) {
         var authentication = this;
         
-        authentication.account = {};
-        
-        initAccount();
-        
         authentication.logout = function() {
-            initAccount();
             delete $http.defaults.headers.common['Authorization'];
             credentialService.clean();
             searchCriterias.clear();
-            sessionStorage.clear();
+            session.clear();
         };
         
         authentication.login = function() {
             var defer = $q.defer();
             
-            sessionStorage.token = getAuthorizationHeader();
+            session.setAuthorizationHeader();
             
             $http.get(endpoints.get('currentAccount')).then(function(currentAccount) {
                 if (currentAccount.status === 200) {
-                    authentication.account.infos = currentAccount.data;
-                    
-                    authentication.account.authenticated = true;
-                    
-                    credentialService.getCredentialsForUsername(authentication.account.username);
+                    session.update(currentAccount.data);
+                    credentialService.getCredentialsForUsername(session.account.username);
                     
                     defer.resolve(currentAccount.infos);
                 }
@@ -47,26 +39,5 @@
             
             return defer.promise;
         };
-        
-        authentication.getCurrentAccount = function () {
-            return authentication.account.infos;
-        };
-        
-        function initAccount() {
-            authentication.account = {
-                infos : {},
-                username: '',
-                password: '',
-                authenticated: false
-            };
-        }
-     
-        function getAuthorizationHeader() {
-            var authorizationheader = 'Basic ';
-            
-            authorizationheader += encryptionUtils.encodeToBase64(authentication.account.username + ':' + authentication.account.password);
-            
-            return authorizationheader;
-        }
     }
 })();

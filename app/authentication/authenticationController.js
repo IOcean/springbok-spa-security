@@ -3,14 +3,14 @@
 
     angular.module('springbok.security').controller('authenticationController', authenticationController);
     
-    authenticationController.$inject = ['$scope', 'authenticationRedirect', 'authenticationService', '$location'];
+    authenticationController.$inject = ['$scope', '$location', 'session', 'authenticationRedirect', 'authenticationService'];
     
-    function authenticationController($scope, authenticationRedirect, authenticationService, $location) {
+    function authenticationController($scope, $location, session, authenticationRedirect, authenticationService) {
         var authentication = this;
         
-        authentication.account = authenticationService.account;
+        authentication.session = session;
         
-        this.login = function () {
+        this.login = function() {
             authenticationService.login().then(function() {
                 $scope.$emit('Notify', 'success', 'SECURITY_LOGIN_SUCCESS');
                 $scope.$emit('AuthenticationChange');
@@ -37,5 +37,7 @@
             $scope.$emit('AuthenticationChange');
             $location.path('/');
         };
+        
+        console.log('authCtrl : session.account', session.account);
     }
 })();
