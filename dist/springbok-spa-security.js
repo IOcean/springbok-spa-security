@@ -212,6 +212,11 @@
             session.defaultExpirationDurationInMilliseconds = defaultExpirationDurationInMilliseconds;
         };
 
+        session.setLanguage = function (languageKey) {
+            session.account.language = languageKey;
+            session.persist();
+        };
+
         function getCurrent() {
             if (localStorage.account) {
                 var account = JSON.parse(localStorage.account);
@@ -229,7 +234,8 @@
                 username: '',
                 password: '',
                 expiration: null,
-                authenticated: false
+                authenticated: false,
+                language: CONFIG.app.preferredLanguage
             };
         }
     }
