@@ -37,7 +37,5 @@
             $scope.$emit('AuthenticationChange');
             $location.path('/');
         };
-        
-        console.log('authCtrl : session.account', session.account);
     }
 })();

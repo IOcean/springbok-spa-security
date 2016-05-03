@@ -18,7 +18,7 @@
         authentication.login = function() {
             var defer = $q.defer();
             
-            session.setAuthorizationHeader();
+            session.setTokenAndExpiration();
             
             $http.get(endpoints.get('currentAccount')).then(function(currentAccount) {
                 if (currentAccount.status === 200) {
