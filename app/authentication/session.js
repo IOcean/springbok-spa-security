@@ -38,7 +38,7 @@
         
         session.clear = function() {
             init();
-            localStorage.clear();
+            localStorage.removeItem('account');
         };
         
         session.getCurrent = getCurrent;
@@ -57,9 +57,11 @@
         };
         
         session.setLanguage = function(languageKey) {
-            session.account.language = languageKey;
-            session.persist();
+            session.language = languageKey;
+            localStorage.language = session.language;
         };
+        
+        session.updateLanguage = updateLanguage();
         
         function getCurrent() {
             if (localStorage.account) {
@@ -69,17 +71,32 @@
                 init();
             }
             
+            updateLanguage();
+            
             return session.account;
         }
         
+        function updateLanguage() {
+            var language = CONFIG.app.preferredLanguage;
+            
+            if (localStorage.language) {
+                language = localStorage.language;
+            }
+            
+            session.language = language;
+        }
+        
+        /**
+         * Clear all account data except for the language if one has been selected
+         * @returns {void}
+         */
         function init() {
             session.account = {
                 infos : {},
                 username: '',
                 password: '',
                 expiration: null,
-                authenticated: false,
-                language: CONFIG.app.preferredLanguage
+                authenticated: false
             };
         }
     }
