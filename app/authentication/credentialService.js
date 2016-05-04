@@ -11,6 +11,23 @@
         var promise;
 
         return {
+            all: function() {
+                var deferred = $q.defer();
+
+                var credentialsParams = {
+                    params: {
+                        size: 1000,
+                        direction: 'asc',
+                        properties: 'label'
+                    }
+                };
+
+                $http.get(endpoints.get('credentials') + '/search', credentialsParams).then(function (credentials) {
+                    deferred.resolve(credentials.data.content);
+                });
+
+                return deferred.promise;
+            },
             getCredentialsForUsername: function (username) {
                 if (!_.isUndefined(credentials) && credentials.length > 0 && !_.isUndefined(promise)) {
                     return promise;
@@ -27,8 +44,8 @@
                     }
                 };
 
-                $http.get(endpoints.get('credentials') + '/search', credentialsParams).success(function (data) {
-                    credentials = data.content;
+                $http.get(endpoints.get('credentials') + '/search', credentialsParams).then(function (userCredentials) {
+                    credentials = userCredentials.data.content;
                     deferred.resolve(credentials);
                 });
 
