@@ -1,9 +1,9 @@
 (function () {
     'use-strict';
 
-    const securityDependencies = ['ngCookies', 'springbok.core'];
+    var securityDependencies = ['ngCookies', 'springbok.core'];
 
-    const security = angular.module('springbok.security', securityDependencies);
+    var security = angular.module('springbok.security', securityDependencies);
 
     security.run(['endpoints', function (endpoints) {
         endpoints.add('accounts', 'accounts');
