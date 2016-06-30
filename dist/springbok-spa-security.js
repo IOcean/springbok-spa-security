@@ -45,7 +45,6 @@
 
         this.logout = function () {
             authenticationService.logout();
-            authentication.account = authenticationService.account;
             $scope.$emit('Notify', 'warning', 'SECURITY_LOGIN_LOGOUT');
             $scope.$emit('AuthenticationChange');
             $location.path('/');
